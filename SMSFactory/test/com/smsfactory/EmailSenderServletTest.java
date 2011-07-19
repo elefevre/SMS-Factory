@@ -67,7 +67,7 @@ public class EmailSenderServletTest {
 						BEGINNING_OF_EMAIL_CONTENT
 								+ "user@site.com hello world"));
 
-		assertThat((String) message.getContent(), is("hello world"));
+		assertThat((String) message.getContent(), is("user@site.com hello world"));
 	}
 
 	private static final String BEGINNING_OF_EMAIL_CONTENT = "Received: by 10.52.106.201 with SMTP id gw9mr961116vdb.45.1311092253529;\n"
