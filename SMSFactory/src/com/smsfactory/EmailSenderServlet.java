@@ -28,7 +28,6 @@ public class EmailSenderServlet extends HttpServlet {
 			resp.setContentType("text/plain");
 			e.printStackTrace(resp.getWriter());
 			Throwables.propagate(e);
-
 		}
 	}
 
@@ -43,14 +42,21 @@ public class EmailSenderServlet extends HttpServlet {
 		Message msg = new MimeMessage(session);
 		msg.setFrom(new InternetAddress("ericlef@gmail.com", "no-reply"));
 
-		msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-				findRecipientEmail(messageReceived), ""));
+		String recipientEmail = findRecipientEmail(messageReceived);
+		if (!recipientEmail.isEmpty()) {
+			msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+					recipientEmail, ""));
+		} else {
+			msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+					"contact@ericlefevre.net", ""));
+		}
+		String smsContent = findSmsContent(messageReceived);
+		msg.setText(smsContent.isEmpty() ? (String) messageReceived
+				.getContent() : smsContent);
 		msg.addRecipient(Message.RecipientType.BCC, new InternetAddress(
 				"eric@smsfactory.fr", "Eric"));
+
 		msg.setSubject("Email sent by SMS");
-
-		msg.setText(findSmsContent(messageReceived));
-
 		return msg;
 	}
 
@@ -67,10 +73,9 @@ public class EmailSenderServlet extends HttpServlet {
 		boolean startCopying = false;
 		for (String line : lines) {
 			if (startCopying) {
-				if (!line.startsWith("You received a text message from "))
-					afterEmailPreambule += line + "\n";
+				afterEmailPreambule += line + "\n";
 			} else {
-				if (line.startsWith("Date: ")) {
+				if (line.startsWith("You received a text message from ")) {
 					startCopying = true;
 				}
 			}
