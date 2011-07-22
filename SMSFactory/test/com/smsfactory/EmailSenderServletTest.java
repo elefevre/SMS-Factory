@@ -52,7 +52,7 @@ public class EmailSenderServletTest {
 			throws Exception {
 		Message message = new EmailSenderServlet()
 				.createMessage(new MockHttpServletRequest(
-						emailContent("user@site.com hello world")));
+						emailWithSmsContent("user@site.com hello world")));
 		InternetAddress to = (InternetAddress) message
 				.getRecipients(RecipientType.TO)[0];
 
@@ -64,7 +64,7 @@ public class EmailSenderServletTest {
 			throws Exception {
 		Message message = new EmailSenderServlet()
 				.createMessage(new MockHttpServletRequest(
-						emailContent("user@site.com hello world")));
+						emailWithSmsContent("user@site.com hello world")));
 
 		assertThat((String) message.getContent(), containsString("hello world"));
 	}
@@ -72,8 +72,7 @@ public class EmailSenderServletTest {
 	@Test
 	public void uses_a_title() throws Exception {
 		Message message = new EmailSenderServlet()
-				.createMessage(new MockHttpServletRequest(
-						emailContent("user@site.com hello world")));
+				.createMessage(new MockHttpServletRequest(email()));
 
 		assertThat((String) message.getSubject(), is("Message envoye par SMS"));
 	}
@@ -81,8 +80,7 @@ public class EmailSenderServletTest {
 	@Test
 	public void adds_a_signature() throws Exception {
 		Message message = new EmailSenderServlet()
-				.createMessage(new MockHttpServletRequest(
-						emailContent("user@site.com hello world")));
+				.createMessage(new MockHttpServletRequest(email()));
 
 		assertThat(
 				(String) message.getContent(),
@@ -93,66 +91,76 @@ public class EmailSenderServletTest {
 	public void adds_an_explanation() throws Exception {
 		Message message = new EmailSenderServlet()
 				.createMessage(new MockHttpServletRequest(
-						emailContent("user@site.com hello world")));
+						emailWithPhoneNumber("+555555555")));
 
 		assertThat(
 				(String) message.getContent(),
 				containsString("\n----\nCe message a été envoyé par SMS à nos services. Merci de ne pas répondre à cet email."));
 	}
 
-	private static String emailContent(String smsContent) {
-		return BEGINNING_OF_EMAIL_CONTENT + smsContent;
+	private static String email() {
+		return emailContent(null, null);
 	}
 
-	private static final String BEGINNING_OF_EMAIL_CONTENT = "Received: by 10.52.106.201 with SMTP id gw9mr961116vdb.45.1311092253529;\n"
-			+ //
-			"       Tue, 19 Jul 2011 09:17:33 -0700 (PDT)\n"
-			+ //
-			"Return-Path: <txtforward@txtforward.com>\n"
-			+ //
-			"Received: from domU-12-31-39-04-60-11.txtforward.com (txtforward.com [174.129.217.87])\n"
-			+ //
-			"       by gmr-mx.google.com with ESMTP id v20si4373245vdu.2.2011.07.19.09.17.33;\n"
-			+ //
-			"       Tue, 19 Jul 2011 09:17:33 -0700 (PDT)\n"
-			+ //
-			"Received-SPF: pass (google.com: best guess record for domain of txtforward@txtforward.com designates 174.129.217.87 as permitted sender) client-ip=174.129.217.87;\n"
-			+ //
-			"Authentication-Results: gmr-mx.google.com; spf=pass (google.com: best guess record for domain of txtforward@txtforward.com designates 174.129.217.87 as permitted sender) smtp.mail=txtforward@txtforward.com\n"
-			+ //
-			"Received: by domU-12-31-39-04-60-11.txtforward.com (Postfix, from userid 48)\n"
-			+ //
-			"       id 4FED2A6E69; Tue, 19 Jul 2011 12:17:33 -0400 (EDT)\n"
-			+ //
-			"To: sms@smsfactory-test.appspotmail.com\n"
-			+ //
-			"\n"
-			+ //
-			"Subject: Text : Eric Lefevre-Ardant (+33613828286)\n"
-			+ //
-			"From: Eric Lefevre-Ardant (+555555555) - txtForward <noreply@txtForward.com>\n"
-			+ //
-			"Reply-To: noreply@txtForward.com\n"
-			+ //
-			"MIME-Version: 1.0\n"
-			+ //
-			"Content-type: text/plain; charset=utf-8\n"
-			+ //
-			"Content-Transfer-Encoding: quoted-printable\n"
-			+ //
-			"Message-Id: <20110719161733.4FED2A6E69@domU-12-31-39-04-60-11.txtforward.com>\n"
-			+ //
-			"Date: Tue, 19 Jul 2011 12:17:33 -0400 (EDT)\n"
-			+ //
-			"\n"
-			+ //
-			"\n"
-			+ //
-			"\n"
-			+ //
-			"You received a text message from Eric Lefevre-Ardant (+555555555)\n"
-			+ //
-			"\n";
+	private static String emailWithSmsContent(String smsContent) {
+		return emailContent(smsContent, null);
+	}
+
+	private static String emailWithPhoneNumber(String phoneNumber) {
+		return emailContent(null, phoneNumber);
+	}
+
+	private static String emailContent(String smsContent, String phoneNumber) {
+		return "Received: by 10.52.106.201 with SMTP id gw9mr961116vdb.45.1311092253529;\n"
+				+ //
+				"       Tue, 19 Jul 2011 09:17:33 -0700 (PDT)\n"
+				+ //
+				"Return-Path: <txtforward@txtforward.com>\n"
+				+ //
+				"Received: from domU-12-31-39-04-60-11.txtforward.com (txtforward.com [174.129.217.87])\n"
+				+ //
+				"       by gmr-mx.google.com with ESMTP id v20si4373245vdu.2.2011.07.19.09.17.33;\n"
+				+ //
+				"       Tue, 19 Jul 2011 09:17:33 -0700 (PDT)\n"
+				+ //
+				"Received-SPF: pass (google.com: best guess record for domain of txtforward@txtforward.com designates 174.129.217.87 as permitted sender) client-ip=174.129.217.87;\n"
+				+ //
+				"Authentication-Results: gmr-mx.google.com; spf=pass (google.com: best guess record for domain of txtforward@txtforward.com designates 174.129.217.87 as permitted sender) smtp.mail=txtforward@txtforward.com\n"
+				+ //
+				"Received: by domU-12-31-39-04-60-11.txtforward.com (Postfix, from userid 48)\n"
+				+ //
+				"       id 4FED2A6E69; Tue, 19 Jul 2011 12:17:33 -0400 (EDT)\n"
+				+ //
+				"To: sms@smsfactory-test.appspotmail.com\n"
+				+ //
+				"\n"
+				+ //
+				"Subject: Text : Eric Lefevre-Ardant (+33613828286)\n"
+				+ //
+				"From: Eric Lefevre-Ardant (+555555555) - txtForward <noreply@txtForward.com>\n"
+				+ //
+				"Reply-To: noreply@txtForward.com\n"
+				+ //
+				"MIME-Version: 1.0\n"
+				+ //
+				"Content-type: text/plain; charset=utf-8\n"
+				+ //
+				"Content-Transfer-Encoding: quoted-printable\n"
+				+ //
+				"Message-Id: <20110719161733.4FED2A6E69@domU-12-31-39-04-60-11.txtforward.com>\n"
+				+ //
+				"Date: Tue, 19 Jul 2011 12:17:33 -0400 (EDT)\n"
+				+ //
+				"\n"
+				+ //
+				"\n"
+				+ //
+				"\n"
+				+ //
+				"You received a text message from Eric Lefevre-Ardant ("
+				+ phoneNumber + ")\n" + //
+				"\n" + smsContent;
+	}
 
 	@SuppressWarnings("rawtypes")
 	private static class MockHttpServletRequest implements HttpServletRequest {
