@@ -53,8 +53,12 @@ public class EmailSenderServlet extends HttpServlet {
 		String smsContent = findSmsContent(messageReceived);
 		String emailBody = smsContent.isEmpty() ? (String) messageReceived
 				.getContent() : smsContent;
-				emailBody += "\n----\nCe message a été envoyé par SMS à nos services. Merci de ne pas répondre à cet email.";
-				emailBody += "\n----\nhttp://smsfactory.fr/ l'envoi d'email par SMS";
+		emailBody += "\n----\nCe message a été envoyé à partir du numéro de téléphone "
+				+ findPhoneNumber(messageReceived)
+				+ " par SMS à nos services à l'intention de "
+				+ recipientEmail
+				+ ". Merci de ne pas répondre à cet email.";
+		emailBody += "\n----\nhttp://smsfactory.fr/ l'envoi d'email par SMS";
 		msg.setText(emailBody);
 		msg.addRecipient(Message.RecipientType.BCC, new InternetAddress(
 				"eric@smsfactory.fr", "Eric"));
@@ -71,20 +75,35 @@ public class EmailSenderServlet extends HttpServlet {
 	private String findSmsContent(MimeMessage messageReceived)
 			throws MessagingException, IOException {
 		String emailContent = (String) messageReceived.getContent();
-		String[] lines = emailContent.split("\n");
 		String afterEmailPreambule = "";
 		boolean startCopying = false;
-		for (String line : lines) {
+		for (String line : emailContent.split("\n")) {
 			if (startCopying) {
 				afterEmailPreambule += line + "\n";
 			} else {
-				if (line.startsWith("You received a text message from ")) {
+				if (isLineAddedByTxtForward(line)) {
 					startCopying = true;
 				}
 			}
 		}
 		afterEmailPreambule = afterEmailPreambule.trim();
 		return afterEmailPreambule;
+	}
+
+	private String findPhoneNumber(MimeMessage messageReceived)
+			throws MessagingException, IOException {
+		String emailContent = (String) messageReceived.getContent();
+		for (String line : emailContent.split("\n")) {
+			if (isLineAddedByTxtForward(line)) {
+				return line.split("[()]")[1];
+			}
+		}
+
+		return "<Numéro de téléphone inconnu>";
+	}
+
+	private static boolean isLineAddedByTxtForward(String line) {
+		return line.startsWith("You received a text message from ");
 	}
 
 }

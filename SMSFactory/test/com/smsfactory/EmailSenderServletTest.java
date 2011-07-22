@@ -90,12 +90,12 @@ public class EmailSenderServletTest {
 	@Test
 	public void adds_an_explanation() throws Exception {
 		Message message = new EmailSenderServlet()
-				.createMessage(new MockHttpServletRequest(
-						emailWithPhoneNumber("+555555555")));
+				.createMessage(new MockHttpServletRequest(emailContent(
+						"user@site.com hello world", "+555555555")));
 
 		assertThat(
 				(String) message.getContent(),
-				containsString("\n----\nCe message a été envoyé par SMS à nos services. Merci de ne pas répondre à cet email."));
+				containsString("\n----\nCe message a été envoyé à partir du numéro de téléphone +555555555 par SMS à nos services à l'intention de user@site.com. Merci de ne pas répondre à cet email."));
 	}
 
 	private static String email() {
@@ -104,10 +104,6 @@ public class EmailSenderServletTest {
 
 	private static String emailWithSmsContent(String smsContent) {
 		return emailContent(smsContent, null);
-	}
-
-	private static String emailWithPhoneNumber(String phoneNumber) {
-		return emailContent(null, phoneNumber);
 	}
 
 	private static String emailContent(String smsContent, String phoneNumber) {
