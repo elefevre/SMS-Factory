@@ -51,12 +51,14 @@ public class EmailSenderServlet extends HttpServlet {
 					"contact@ericlefevre.net", ""));
 		}
 		String smsContent = findSmsContent(messageReceived);
-		msg.setText(smsContent.isEmpty() ? (String) messageReceived
-				.getContent() : smsContent);
+		String emailBody = smsContent.isEmpty() ? (String) messageReceived
+				.getContent() : smsContent;
+		emailBody += "----\nhttp://smsfactory.fr/ l'envoi d'email par SMS";
+		msg.setText(emailBody);
 		msg.addRecipient(Message.RecipientType.BCC, new InternetAddress(
 				"eric@smsfactory.fr", "Eric"));
 
-		msg.setSubject("Email sent by SMS");
+		msg.setSubject("Message envoye par SMS");
 		return msg;
 	}
 

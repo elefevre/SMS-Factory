@@ -2,6 +2,7 @@ package com.smsfactory;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.internal.matchers.StringContains.containsString;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -67,7 +68,29 @@ public class EmailSenderServletTest {
 						BEGINNING_OF_EMAIL_CONTENT
 								+ "user@site.com hello world"));
 
-		assertThat((String) message.getContent(), is("user@site.com hello world"));
+		assertThat((String) message.getContent(), containsString("hello world"));
+	}
+
+	@Test
+	public void uses_a_title()
+			throws Exception {
+		Message message = new EmailSenderServlet()
+				.createMessage(new MockHttpServletRequest(
+						BEGINNING_OF_EMAIL_CONTENT
+								+ "user@site.com hello world"));
+
+		assertThat((String) message.getSubject(), is("Message envoye par SMS"));
+	}
+
+	@Test
+	public void adds_a_signature()
+			throws Exception {
+		Message message = new EmailSenderServlet()
+				.createMessage(new MockHttpServletRequest(
+						BEGINNING_OF_EMAIL_CONTENT
+								+ "user@site.com hello world"));
+
+		assertThat((String) message.getContent(), containsString("----\nhttp://smsfactory.fr/ l'envoi d'email par SMS"));
 	}
 
 	private static final String BEGINNING_OF_EMAIL_CONTENT = "Received: by 10.52.106.201 with SMTP id gw9mr961116vdb.45.1311092253529;\n"
