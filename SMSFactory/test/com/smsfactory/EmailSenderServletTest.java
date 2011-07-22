@@ -43,7 +43,7 @@ public class EmailSenderServletTest {
 				.createMessage(new MockHttpServletRequest());
 		InternetAddress from = (InternetAddress) message.getFrom()[0];
 
-		assertThat(from.getAddress(), is("ericlef@gmail.com"));
+		assertThat(from.getAddress(), is("eric@smsfactory.fr"));
 	}
 
 	@Test

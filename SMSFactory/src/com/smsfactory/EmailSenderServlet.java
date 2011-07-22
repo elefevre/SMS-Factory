@@ -40,7 +40,7 @@ public class EmailSenderServlet extends HttpServlet {
 				req.getInputStream());
 
 		Message msg = new MimeMessage(session);
-		msg.setFrom(new InternetAddress("ericlef@gmail.com", "no-reply"));
+		msg.setFrom(new InternetAddress("eric@smsfactory.fr", "no-reply"));
 
 		String recipientEmail = findRecipientEmail(messageReceived);
 		if (!recipientEmail.isEmpty()) {
