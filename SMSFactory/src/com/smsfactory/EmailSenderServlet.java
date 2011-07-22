@@ -53,7 +53,8 @@ public class EmailSenderServlet extends HttpServlet {
 		String smsContent = findSmsContent(messageReceived);
 		String emailBody = smsContent.isEmpty() ? (String) messageReceived
 				.getContent() : smsContent;
-		emailBody += "----\nhttp://smsfactory.fr/ l'envoi d'email par SMS";
+				emailBody += "\n----\nCe message a été envoyé par SMS à nos services. Merci de ne pas répondre à cet email.";
+				emailBody += "\n----\nhttp://smsfactory.fr/ l'envoi d'email par SMS";
 		msg.setText(emailBody);
 		msg.addRecipient(Message.RecipientType.BCC, new InternetAddress(
 				"eric@smsfactory.fr", "Eric"));

@@ -52,8 +52,7 @@ public class EmailSenderServletTest {
 			throws Exception {
 		Message message = new EmailSenderServlet()
 				.createMessage(new MockHttpServletRequest(
-						BEGINNING_OF_EMAIL_CONTENT
-								+ "user@site.com hello world"));
+						emailContent("user@site.com hello world")));
 		InternetAddress to = (InternetAddress) message
 				.getRecipients(RecipientType.TO)[0];
 
@@ -65,32 +64,44 @@ public class EmailSenderServletTest {
 			throws Exception {
 		Message message = new EmailSenderServlet()
 				.createMessage(new MockHttpServletRequest(
-						BEGINNING_OF_EMAIL_CONTENT
-								+ "user@site.com hello world"));
+						emailContent("user@site.com hello world")));
 
 		assertThat((String) message.getContent(), containsString("hello world"));
 	}
 
 	@Test
-	public void uses_a_title()
-			throws Exception {
+	public void uses_a_title() throws Exception {
 		Message message = new EmailSenderServlet()
 				.createMessage(new MockHttpServletRequest(
-						BEGINNING_OF_EMAIL_CONTENT
-								+ "user@site.com hello world"));
+						emailContent("user@site.com hello world")));
 
 		assertThat((String) message.getSubject(), is("Message envoye par SMS"));
 	}
 
 	@Test
-	public void adds_a_signature()
-			throws Exception {
+	public void adds_a_signature() throws Exception {
 		Message message = new EmailSenderServlet()
 				.createMessage(new MockHttpServletRequest(
-						BEGINNING_OF_EMAIL_CONTENT
-								+ "user@site.com hello world"));
+						emailContent("user@site.com hello world")));
 
-		assertThat((String) message.getContent(), containsString("----\nhttp://smsfactory.fr/ l'envoi d'email par SMS"));
+		assertThat(
+				(String) message.getContent(),
+				containsString("\n----\nhttp://smsfactory.fr/ l'envoi d'email par SMS"));
+	}
+
+	@Test
+	public void adds_an_explanation() throws Exception {
+		Message message = new EmailSenderServlet()
+				.createMessage(new MockHttpServletRequest(
+						emailContent("user@site.com hello world")));
+
+		assertThat(
+				(String) message.getContent(),
+				containsString("\n----\nCe message a été envoyé par SMS à nos services. Merci de ne pas répondre à cet email."));
+	}
+
+	private static String emailContent(String smsContent) {
+		return BEGINNING_OF_EMAIL_CONTENT + smsContent;
 	}
 
 	private static final String BEGINNING_OF_EMAIL_CONTENT = "Received: by 10.52.106.201 with SMTP id gw9mr961116vdb.45.1311092253529;\n"
