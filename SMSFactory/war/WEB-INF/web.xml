@@ -8,14 +8,6 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>EmailSender</servlet-name>
 		<servlet-class>com.smsfactory.EmailSenderServlet</servlet-class>
 	</servlet>
-	<servlet>
-		<servlet-name>SMSFactory</servlet-name>
-		<servlet-class>com.smsfactory.SMSFactoryServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>SMSFactory</servlet-name>
-		<url-pattern>/smsfactory</url-pattern>
-	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>EmailSender</servlet-name>
 		<url-pattern>/_ah/mail/*</url-pattern>
