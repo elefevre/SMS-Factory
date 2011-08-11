@@ -6,7 +6,6 @@ import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletException;
@@ -18,11 +17,21 @@ import com.google.appengine.repackaged.com.google.common.base.Throwables;
 
 @SuppressWarnings("serial")
 public class EmailSenderServlet extends HttpServlet {
+	private final Transport transport;
+
+	public EmailSenderServlet() {
+		this(new Transport());
+	}
+
+	public EmailSenderServlet(Transport transport) {
+		this.transport = transport;
+	}
+
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		try {
-			Transport.send(createMessage(req));
+			transport.send(createMessage(req));
 		} catch (Exception e) {
 			e.printStackTrace();
 			resp.setContentType("text/plain");
@@ -31,8 +40,8 @@ public class EmailSenderServlet extends HttpServlet {
 		}
 	}
 
-	public Message createMessage(HttpServletRequest req)
-			throws MessagingException, IOException {
+	Message createMessage(HttpServletRequest req) throws MessagingException,
+			IOException {
 		Properties props = new Properties();
 		Session session = Session.getDefaultInstance(props, null);
 
