@@ -44,7 +44,7 @@ public class EmailSenderServletTest {
 				.createMessage(new MockHttpServletRequest());
 		InternetAddress from = (InternetAddress) message.getFrom()[0];
 
-		assertThat(from.getAddress(), is("eric@smsfactory.fr"));
+		assertThat(from.getAddress(), is("robot@smsfactory.fr"));
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class EmailSenderServletTest {
 
 		assertThat(
 				(String) message.getContent(),
-				containsString("\n----\nhttp://smsfactory.fr/ l'envoi d'email par SMS"));
+				containsString("\n\nhttp://smsfactory.fr/ l'envoi d'email par SMS"));
 	}
 
 	@Test

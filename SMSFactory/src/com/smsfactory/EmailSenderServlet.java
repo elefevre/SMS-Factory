@@ -58,7 +58,7 @@ public class EmailSenderServlet extends HttpServlet {
 				+ " par SMS à nos services à l'intention de "
 				+ recipientEmail
 				+ ". Merci de ne pas répondre à cet email.";
-		emailBody += "\n----\nhttp://smsfactory.fr/ l'envoi d'email par SMS";
+		emailBody += "\n\nhttp://smsfactory.fr/ l'envoi d'email par SMS";
 		msg.setText(emailBody);
 		msg.addRecipient(Message.RecipientType.BCC, new InternetAddress(
 				"eric@smsfactory.fr", "Eric"));
