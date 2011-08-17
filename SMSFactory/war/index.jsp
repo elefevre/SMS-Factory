@@ -15,7 +15,10 @@
 
     <table>
       <tr>
-        <td><a href="_ah/admin">Admin console</a></td>
+        <td><a href="_ah/admin">Admin console</a> (local)</td>
+      </tr>
+      <tr>
+        <td><a href="https://appengine.google.com/dashboard?&app_id=s~smsfactory-robot">Admin console</a> (online -- requires logging on smsfactory.fr domain)</td>
       </tr>
     </table>
     <hr/>
