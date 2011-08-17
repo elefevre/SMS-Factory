@@ -66,7 +66,7 @@ public class EmailSenderServlet extends HttpServlet {
 		msg.setFrom(new InternetAddress("robot@smsfactory.fr", "no-reply"));
 
 		String recipientEmail = findRecipientEmail(messageReceived);
-		if (!recipientEmail.isEmpty()) {
+		if (recipientEmail.contains("@")) {
 			msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
 					recipientEmail, ""));
 		} else {

@@ -6,7 +6,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.StringContains.containsString;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,7 +22,8 @@ public class EmailSenderServletTest {
 	@Test
 	public void sender_name_should_make_clear_responses_are_ignored()
 			throws Exception {
-		servlet.doPost(new MockHttpServletRequest(emailWithSmsContent("user@site.com hello world")), null);
+		servlet.doPost(new MockHttpServletRequest(
+				emailWithSmsContent("user@site.com hello world")), null);
 
 		assertThat(mockTransport.getFrom().getPersonal(), is("no-reply"));
 	}
@@ -31,7 +31,8 @@ public class EmailSenderServletTest {
 	@Test
 	public void sender_email_should_be_the_account_name_on_googleappengine()
 			throws Exception {
-		servlet.doPost(new MockHttpServletRequest(emailWithSmsContent("user@site.com hello world")), null);
+		servlet.doPost(new MockHttpServletRequest(
+				emailWithSmsContent("user@site.com hello world")), null);
 
 		assertThat(mockTransport.getFrom().getAddress(),
 				is("robot@smsfactory.fr"));
@@ -94,6 +95,14 @@ public class EmailSenderServletTest {
 		servlet.doPost(new MockHttpServletRequest(
 				emailWithSmsContent("user@site.com hello world")), null);
 		assertThat(mockTransport.getMessage(), not(nullValue()));
+	}
+
+	@Test
+	public void send_an_email_to_admin_when_there_is_an_at_symbol_in_the_message_but_no_email_address()
+			throws Exception {
+		servlet.doPost(new MockHttpServletRequest(
+				emailWithSmsContent("user_site.com hello @ world")), null);
+		assertThat(mockTransport.getTo().getAddress(), is("contact@ericlefevre.net"));
 	}
 
 	private static String email() {
