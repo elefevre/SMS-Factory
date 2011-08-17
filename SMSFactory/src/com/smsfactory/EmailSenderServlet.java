@@ -31,6 +31,9 @@ public class EmailSenderServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		try {
+			if (!findSmsContent(req).contains("@")) {
+				return;
+			}
 			transport.send(createMessage(req));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -38,6 +41,17 @@ public class EmailSenderServlet extends HttpServlet {
 			e.printStackTrace(resp.getWriter());
 			Throwables.propagate(e);
 		}
+	}
+
+	private String findSmsContent(HttpServletRequest req)
+			throws MessagingException, IOException {
+		Properties props = new Properties();
+		Session session = Session.getDefaultInstance(props, null);
+
+		MimeMessage messageReceived = new MimeMessage(session,
+				req.getInputStream());
+		String findSmsContent = findSmsContent(messageReceived);
+		return findSmsContent;
 	}
 
 	private Message createMessage(HttpServletRequest req)

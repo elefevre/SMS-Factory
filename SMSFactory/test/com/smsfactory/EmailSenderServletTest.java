@@ -1,9 +1,12 @@
 package com.smsfactory;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.StringContains.containsString;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +23,7 @@ public class EmailSenderServletTest {
 	@Test
 	public void sender_name_should_make_clear_responses_are_ignored()
 			throws Exception {
-		servlet.doPost(new MockHttpServletRequest(), null);
+		servlet.doPost(new MockHttpServletRequest(emailWithSmsContent("user@site.com hello world")), null);
 
 		assertThat(mockTransport.getFrom().getPersonal(), is("no-reply"));
 	}
@@ -28,7 +31,7 @@ public class EmailSenderServletTest {
 	@Test
 	public void sender_email_should_be_the_account_name_on_googleappengine()
 			throws Exception {
-		servlet.doPost(new MockHttpServletRequest(), null);
+		servlet.doPost(new MockHttpServletRequest(emailWithSmsContent("user@site.com hello world")), null);
 
 		assertThat(mockTransport.getFrom().getAddress(),
 				is("robot@smsfactory.fr"));
@@ -81,8 +84,20 @@ public class EmailSenderServletTest {
 				containsString("\n----\nCe message a �t� envoy� � partir du num�ro de t�l�phone +555555555 par SMS � nos services � l'intention de user@site.com. Merci de ne pas r�pondre � cet email."));
 	}
 
+	@Test
+	public void does_not_send_an_email_when_there_is_no_at_symbol_anywhere_in_the_message()
+			throws Exception {
+		servlet.doPost(new MockHttpServletRequest(
+				emailWithSmsContent("user_site.com hello world")), null);
+		assertThat(mockTransport.getMessage(), nullValue());
+
+		servlet.doPost(new MockHttpServletRequest(
+				emailWithSmsContent("user@site.com hello world")), null);
+		assertThat(mockTransport.getMessage(), not(nullValue()));
+	}
+
 	private static String email() {
-		return emailContent(null, null);
+		return emailContent("user@site.com hello world", null);
 	}
 
 	private static String emailWithSmsContent(String smsContent) {
