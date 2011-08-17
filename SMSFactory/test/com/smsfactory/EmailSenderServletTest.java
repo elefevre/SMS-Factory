@@ -4,85 +4,80 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.internal.matchers.StringContains.containsString;
 
-
-import javax.mail.Message;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage.RecipientType;
-
 import org.junit.Before;
 import org.junit.Test;
 
 public class EmailSenderServletTest {
 	private EmailSenderServlet servlet;
+	private MockTransport mockTransport;
 
 	@Before
 	public void setup() {
-		servlet = new EmailSenderServlet();
+		mockTransport = new MockTransport();
+		servlet = new EmailSenderServlet(mockTransport);
 	}
 
 	@Test
 	public void sender_name_should_make_clear_responses_are_ignored()
 			throws Exception {
-		Message message = servlet.createMessage(new MockHttpServletRequest());
-		InternetAddress from = (InternetAddress) message.getFrom()[0];
+		servlet.doPost(new MockHttpServletRequest(), null);
 
-		assertThat(from.getPersonal(), is("no-reply"));
+		assertThat(mockTransport.getFrom().getPersonal(), is("no-reply"));
 	}
 
 	@Test
 	public void sender_email_should_be_the_account_name_on_googleappengine()
 			throws Exception {
-		Message message = servlet.createMessage(new MockHttpServletRequest());
-		InternetAddress from = (InternetAddress) message.getFrom()[0];
+		servlet.doPost(new MockHttpServletRequest(), null);
 
-		assertThat(from.getAddress(), is("robot@smsfactory.fr"));
+		assertThat(mockTransport.getFrom().getAddress(),
+				is("robot@smsfactory.fr"));
 	}
 
 	@Test
 	public void sends_an_email_to_the_address_at_the_beginning_of_the_content()
 			throws Exception {
-		Message message = servlet.createMessage(new MockHttpServletRequest(
-				emailWithSmsContent("user@site.com hello world")));
-		InternetAddress to = (InternetAddress) message
-				.getRecipients(RecipientType.TO)[0];
+		servlet.doPost(new MockHttpServletRequest(
+				emailWithSmsContent("user@site.com hello world")), null);
 
-		assertThat(to.getAddress(), is("user@site.com"));
+		assertThat(mockTransport.getTo().getAddress(), is("user@site.com"));
 	}
 
 	@Test
 	public void sends_the_text_that_follows_the_email_address()
 			throws Exception {
-		Message message = servlet.createMessage(new MockHttpServletRequest(
-				emailWithSmsContent("user@site.com hello world")));
+		servlet.doPost(new MockHttpServletRequest(
+				emailWithSmsContent("user@site.com hello world")), null);
 
-		assertThat((String) message.getContent(), containsString("hello world"));
+		assertThat((String) mockTransport.getContent(),
+				containsString("hello world"));
 	}
 
 	@Test
 	public void uses_a_title() throws Exception {
-		Message message = servlet.createMessage(new MockHttpServletRequest(
-				email()));
+		servlet.doPost(new MockHttpServletRequest(email()), null);
 
-		assertThat((String) message.getSubject(), is("Message envoye par SMS"));
+		assertThat((String) mockTransport.getMessage().getSubject(),
+				is("Message envoye par SMS"));
 	}
 
 	@Test
 	public void adds_a_signature() throws Exception {
-		Message message = servlet.createMessage(new MockHttpServletRequest(
-				email()));
+		servlet.doPost(new MockHttpServletRequest(email()), null);
 
 		assertThat(
-				(String) message.getContent(),
+				mockTransport.getContent(),
 				containsString("\n\nhttp://smsfactory.fr/ l'envoi d'email par SMS"));
 	}
 
 	@Test
 	public void adds_an_explanation() throws Exception {
-		Message message = servlet.createMessage(new MockHttpServletRequest(
-				emailContent("user@site.com hello world", "+555555555")));
+		servlet.doPost(
+				new MockHttpServletRequest(emailContent(
+						"user@site.com hello world", "+555555555")), null);
 
 		assertThat(
-				(String) message.getContent(),
+				mockTransport.getContent(),
 				containsString("\n----\nCe message a �t� envoy� � partir du num�ro de t�l�phone +555555555 par SMS � nos services � l'intention de user@site.com. Merci de ne pas r�pondre � cet email."));
 	}
 

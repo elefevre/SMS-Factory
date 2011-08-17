@@ -40,8 +40,8 @@ public class EmailSenderServlet extends HttpServlet {
 		}
 	}
 
-	Message createMessage(HttpServletRequest req) throws MessagingException,
-			IOException {
+	private Message createMessage(HttpServletRequest req)
+			throws MessagingException, IOException {
 		Properties props = new Properties();
 		Session session = Session.getDefaultInstance(props, null);
 
@@ -62,11 +62,11 @@ public class EmailSenderServlet extends HttpServlet {
 		String smsContent = findSmsContent(messageReceived);
 		String emailBody = smsContent.isEmpty() ? (String) messageReceived
 				.getContent() : smsContent;
-		emailBody += "\n----\nCe message a ŽtŽ envoyŽ ˆ partir du numŽro de tŽlŽphone "
+		emailBody += "\n----\nCe message a ï¿½tï¿½ envoyï¿½ ï¿½ partir du numï¿½ro de tï¿½lï¿½phone "
 				+ findPhoneNumber(messageReceived)
-				+ " par SMS ˆ nos services ˆ l'intention de "
+				+ " par SMS ï¿½ nos services ï¿½ l'intention de "
 				+ recipientEmail
-				+ ". Merci de ne pas rŽpondre ˆ cet email.";
+				+ ". Merci de ne pas rï¿½pondre ï¿½ cet email.";
 		emailBody += "\n\nhttp://smsfactory.fr/ l'envoi d'email par SMS";
 		msg.setText(emailBody);
 		msg.addRecipient(Message.RecipientType.BCC, new InternetAddress(
@@ -108,7 +108,7 @@ public class EmailSenderServlet extends HttpServlet {
 			}
 		}
 
-		return "<NumŽro de tŽlŽphone inconnu>";
+		return "<Numï¿½ro de tï¿½lï¿½phone inconnu>";
 	}
 
 	private static boolean isLineAddedByTxtForward(String line) {
